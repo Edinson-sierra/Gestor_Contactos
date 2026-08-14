@@ -84,7 +84,6 @@ export default function Home() {
   return (
     <main className="container">
       <header className="header">
-        <span className="eyebrow">Agenda personal</span>
         <h1>Gestor de Contactos</h1>
         <p>Guarda y encuentra la información que necesitas.</p>
       </header>

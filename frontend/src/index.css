@@ -97,16 +97,6 @@ button:active:not(:disabled) {
   margin-bottom: 28px;
 }
 
-.eyebrow {
-  display: block;
-  margin-bottom: 8px;
-  color: var(--primary);
-  font-size: 0.75rem;
-  font-weight: 750;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .header h1 {
   margin-bottom: 6px;
   color: var(--text);
