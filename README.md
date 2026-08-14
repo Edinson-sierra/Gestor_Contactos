@@ -2,6 +2,12 @@
 
 Aplicación web para registrar, consultar, filtrar y eliminar contactos. Utiliza una API REST en PHP con arquitectura MVC y un frontend independiente en React.
 
+## Repositorio
+
+El código fuente del proyecto se encuentra publicado en GitHub:
+
+<https://github.com/Edinson-sierra/Gestor_Contactos>
+
 ## Funcionalidades
 
 - Listado y búsqueda de contactos por nombre, correo o teléfono.
@@ -10,13 +16,18 @@ Aplicación web para registrar, consultar, filtrar y eliminar contactos. Utiliza
 - Opción para rechazar o reemplazar un contacto si el teléfono ya existe.
 - Interfaz responsive con confirmaciones y mensajes de estado.
 
-## Tecnologías y versiones
+## Requisitos y versiones utilizadas
 
-- PHP 8.2.12 y PDO MySQL.
-- Composer 2.10.2 con autoload PSR-4.
-- MariaDB 10.4.32 incluido en XAMPP.
-- Node.js 24.11.1 y npm 11.6.2.
-- React 19.2.8, Vite 8.2.0 y Axios 1.19.0.
+| Tecnología | Versión utilizada | Propósito |
+|---|---:|---|
+| PHP | 8.2.12 | API REST y acceso a datos mediante PDO MySQL |
+| Composer | 2.10.2 | Dependencias y autoload PSR-4 del backend |
+| MariaDB | 10.4.32 | Base de datos incluida en XAMPP; compatible con MySQL 8 |
+| Node.js | 24.11.1 | Entorno de ejecución del frontend |
+| npm | 11.6.2 | Instalación de dependencias y scripts del frontend |
+| React | 19.2.8 | Interfaz de usuario |
+| Vite | 8.2.0 | Servidor de desarrollo y compilación |
+| Axios | 1.19.0 | Comunicación con la API |
 
 También pueden utilizarse versiones compatibles de PHP 8, Node.js y MySQL o MariaDB.
 
@@ -47,13 +58,19 @@ Gestor-Contactos/
 - PHP 8 o superior con PDO MySQL habilitado.
 - Composer, Node.js y npm.
 
-## Base de datos
+## Configuración de la base de datos
 
 1. Iniciar Apache y MySQL desde XAMPP.
-2. Importar `database/schema.sql` desde phpMyAdmin o la consola de MySQL.
-3. El script creará la base de datos `contact_manager` y la tabla `contacts`.
+2. Importar el script [`database/schema.sql`](database/schema.sql) desde phpMyAdmin: seleccionar **Importar**, elegir el archivo y ejecutar la importación.
+3. Como alternativa, importarlo desde la consola, ubicándose en la raíz del proyecto:
 
-## Backend
+```bash
+mysql -u root -p < database/schema.sql
+```
+
+Si el usuario `root` no tiene contraseña, basta con pulsar Enter cuando MySQL la solicite. El script crea, si no existen, la base de datos `contact_manager` y la tabla `contacts`.
+
+## Levantar el backend
 
 Instalar las dependencias:
 
@@ -82,7 +99,9 @@ http://localhost/Gestor-Contactos/backend/public
 
 Si Apache utiliza otro puerto, debe incluirse en la URL, por ejemplo `http://localhost:8080/...`.
 
-## Frontend
+Para comprobar que el backend está funcionando, iniciar Apache y abrir la URL de la API en el navegador. No es necesario ejecutar un servidor PHP adicional cuando el proyecto está dentro de `htdocs`.
+
+## Levantar el frontend
 
 Instalar dependencias y crear la configuración local:
 
