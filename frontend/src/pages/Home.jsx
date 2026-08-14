@@ -54,14 +54,17 @@ export default function Home() {
     const result = await createContact(contact, reemplazar);
 
     if (result.success) {
-      mostrarToast(
-        result.data?.reemplazado
-          ? "Contacto reemplazado correctamente."
-          : "Contacto creado correctamente.",
-        "success",
-      );
+      const message = result.data?.reemplazado
+        ? "Contacto reemplazado correctamente."
+        : "Contacto creado correctamente.";
+
+      // Permite que el formulario restablezca el botón antes de mostrar el aviso.
+      setTimeout(() => mostrarToast(message, "success"), 0);
     } else if (!result.duplicate) {
-      mostrarToast("No fue posible guardar el contacto.", "error");
+      setTimeout(
+        () => mostrarToast("No fue posible guardar el contacto.", "error"),
+        0,
+      );
     }
 
     return result;
