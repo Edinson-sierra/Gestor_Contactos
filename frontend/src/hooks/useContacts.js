@@ -28,7 +28,9 @@ export default function useContacts() {
   const createContact = async (contact, reemplazar = false) => {
     try {
       const response = await contactService.create(contact, reemplazar);
-      await loadContacts(search);
+
+      // La recarga de la lista no debe mantener bloqueado el botón de guardar.
+      loadContacts(search);
 
       return {
         success: true,
