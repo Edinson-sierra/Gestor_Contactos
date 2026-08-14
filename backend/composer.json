@@ -1,0 +1,20 @@
+{
+    "name": "edinson/gestor-contactos",
+    "description": "prueba Tecnica gestor de contacto php + react",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Edinson\\GestorContactos\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Edinson Alejandro Sierra Gutierrez"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}
