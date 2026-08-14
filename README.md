@@ -139,11 +139,18 @@ npm run build
 
 ## Pruebas del backend
 
-Las validaciones principales se comprueban con un script de PHP nativo, sin dependencias adicionales:
+Las pruebas usan PHP nativo, sin dependencias adicionales:
 
 ```bash
 cd backend
 composer test
+```
+
+La prueba de integración inserta y consulta un contacto dentro de una transacción. Al finalizar ejecuta `rollback`, por lo que no deja datos de prueba. También pueden ejecutarse por separado:
+
+```bash
+composer test:unit
+composer test:integration
 ```
 
 ## Autor

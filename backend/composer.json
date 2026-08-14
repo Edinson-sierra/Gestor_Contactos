@@ -15,7 +15,12 @@
     ],
     "minimum-stability": "stable",
     "scripts": {
-        "test": "php tests/ValidadorTest.php"
+        "test": [
+            "@test:unit",
+            "@test:integration"
+        ],
+        "test:unit": "php tests/ValidadorTest.php",
+        "test:integration": "php tests/DatabaseIntegrationTest.php"
     },
     "require": {
         "vlucas/phpdotenv": "^5.6"
