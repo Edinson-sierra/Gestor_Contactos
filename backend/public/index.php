@@ -14,10 +14,6 @@ use Edinson\GestorContactos\Core\Router;
 
 Application::iniciar();
 
-// Configuración de la respuesta
-
-
-header('Content-Type: application/json; charset=utf-8');
 
 // Crear el Router
 
