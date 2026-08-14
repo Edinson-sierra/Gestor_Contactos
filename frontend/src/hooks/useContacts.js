@@ -2,79 +2,89 @@ import { useEffect, useState } from "react";
 import contactService from "../services/contactService";
 
 export default function useContacts() {
-    const [contacts, setContacts] = useState([]);
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
-    // Obtener contactos
-    const loadContacts = async (text = "") => {
-        setLoading(true);
+  const loadContacts = async (text = "") => {
+    setLoading(true);
 
-        try {
-            const response = await contactService.getAll(text);
-            setContacts(response.datos ?? []);
-        } catch (error) {
-            console.error("Error al cargar contactos:", error);
-            setContacts([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+      const response = await contactService.getAll(text);
+      setContacts(response.datos ?? []);
+      setLoadError("");
+    } catch (error) {
+      console.error("Error al cargar contactos:", error);
+      setContacts([]);
+      setLoadError(
+        "No fue posible cargar los contactos. Verifique la conexión con la API.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    // Crear contacto
-    const createContact = async (contact) => {
-        try {
-            const response = await contactService.create(contact);
+  const createContact = async (contact, reemplazar = false) => {
+    try {
+      const response = await contactService.create(contact, reemplazar);
+      await loadContacts(search);
 
-            await loadContacts(search);
+      return {
+        success: true,
+        data: response,
+      };
+    } catch (error) {
+      console.error("Error al crear contacto:", error);
 
-            return {
-                success: true,
-                data: response,
-            };
-        } catch (error) {
-            console.error("Error al crear contacto:", error);
+      const data = error.response?.data;
 
-            return {
-                success: false,
-                errors: error.response?.data?.errores ?? {
-                    general: "No fue posible crear el contacto.",
-                },
-            };
-        }
-    };
+      if (data?.codigo === "TELEFONO_DUPLICADO") {
+        return {
+          success: false,
+          duplicate: true,
+          existing: data.contacto,
+          message: data.mensaje,
+        };
+      }
 
-    // Eliminar contacto
-    const deleteContact = async (id) => {
-        try {
-            await contactService.remove(id);
+      return {
+        success: false,
+        errors: data?.errores ?? {
+          general: data?.mensaje ?? "No fue posible crear el contacto.",
+        },
+      };
+    }
+  };
 
-            await loadContacts(search);
+  const deleteContact = async (id) => {
+    try {
+      await contactService.remove(id);
+      await loadContacts(search);
+      return true;
+    } catch (error) {
+      console.error("Error al eliminar contacto:", error);
+      return false;
+    }
+  };
 
-            return true;
-        } catch (error) {
-            console.error("Error al eliminar contacto:", error);
-            return false;
-        }
-    };
-
-   useEffect(() => {
-
+  useEffect(() => {
+    // Espera brevemente para no consultar la API en cada tecla escrita.
     const timer = setTimeout(() => {
-        loadContacts(search);
+      loadContacts(search);
     }, 300);
 
     return () => clearTimeout(timer);
+  }, [search]);
 
-}, [search]);
-
-    return {
-        contacts,
-        search,
-        setSearch,
-        loading,
-        loadContacts,
-        createContact,
-        deleteContact,
-    };
+  return {
+    contacts,
+    search,
+    setSearch,
+    loading,
+    loadError,
+    loadContacts,
+    createContact,
+    deleteContact,
+  };
 }

@@ -20,7 +20,18 @@ class Request
     {
         $contenido = file_get_contents('php://input');
 
-        return json_decode($contenido, true) ?? [];
+        if ($contenido === false || trim($contenido) === '') {
+            return [];
+        }
+
+        // JSON_THROW_ON_ERROR permite distinguir un JSON inválido de un formulario vacío.
+        $datos = json_decode($contenido, true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($datos)) {
+            throw new \JsonException('El cuerpo debe ser un objeto JSON.');
+        }
+
+        return $datos;
     }
 
     public function parametro(string $nombre, mixed $default = null): mixed

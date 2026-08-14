@@ -1,139 +1,128 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
-import SearchBar from "../components/barra_busqueda";
+import SearchBar from "../components/SearchBar";
 import ContactForm from "../components/ContactForm";
-import ContactTable from "../components/tablacontacto";
+import ContactTable from "../components/ContactTable";
 import ConfirmModal from "../components/ConfirmModal";
 import Toast from "../components/Toast";
 
 import useContacts from "../hooks/useContacts";
 
 export default function Home() {
+  const {
+    contacts,
+    search,
+    setSearch,
+    loading,
+    loadError,
+    createContact,
+    deleteContact,
+  } = useContacts();
 
-    const {
-        contacts,
-        search,
-        setSearch,
-        loading,
-        createContact,
-        deleteContact
-    } = useContacts();
+  const [selected, setSelected] = useState(null);
 
-    const [selected, setSelected] = useState(null);
+  const [toast, setToast] = useState({
+    message: "",
+    type: "success",
+  });
 
-    const [toast, setToast] = useState({
-        message: "",
-        type: "success"
-    });
+  // useRef conserva el temporizador entre renderizados sin provocar uno nuevo.
+  const toastTimeoutRef = useRef(null);
 
-    const handleCreate = async (contact) => {
+  const mostrarToast = (message, type = "success") => {
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
 
-        const result = await createContact(contact);
+    setToast({ message, type });
 
-        if (result.success) {
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast({ message: "", type: "success" });
+      toastTimeoutRef.current = null;
+    }, 4000);
+  };
 
-            setToast({
-                message: "Contacto creado correctamente.",
-                type: "success"
-            });
-
-        } else {
-
-            setToast({
-                message: "No fue posible crear el contacto.",
-                type: "error"
-            });
-
-        }
-
-        return result;
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
     };
+  }, []);
 
-    const handleDelete = async () => {
+  const handleSubmit = async (contact, reemplazar = false) => {
+    const result = await createContact(contact, reemplazar);
 
-        if (!selected) return;
+    if (result.success) {
+      mostrarToast(
+        result.data?.reemplazado
+          ? "Contacto reemplazado correctamente."
+          : "Contacto creado correctamente.",
+        "success",
+      );
+    } else if (!result.duplicate) {
+      mostrarToast("No fue posible guardar el contacto.", "error");
+    }
 
-        const ok = await deleteContact(selected.id);
+    return result;
+  };
 
-        if (ok) {
+  const handleDelete = async () => {
+    if (!selected) return;
 
-            setToast({
-                message: "Contacto eliminado.",
-                type: "success"
-            });
+    const ok = await deleteContact(selected.id);
 
-        } else {
+    if (ok) {
+      mostrarToast("Contacto eliminado.", "success");
+    } else {
+      mostrarToast("No fue posible eliminar.", "error");
+    }
 
-            setToast({
-                message: "No fue posible eliminar.",
-                type: "error"
-            });
+    setSelected(null);
+  };
 
-        }
+  return (
+    <main className="container">
+      <header className="header">
+        <span className="eyebrow">Agenda personal</span>
+        <h1>Gestor de Contactos</h1>
+        <p>Guarda y encuentra la información que necesitas.</p>
+      </header>
 
-        setSelected(null);
-    };
+      <SearchBar value={search} onChange={setSearch} />
 
-    return (
+      <div className="content-grid">
+        <ContactForm onSubmit={handleSubmit} />
 
-        <main className="container">
+        <section className="contacts-panel">
+          {loading ? (
+            <p className="loading-state">Cargando contactos...</p>
+          ) : loadError ? (
+            <p className="load-error" role="alert">
+              {loadError}
+            </p>
+          ) : (
+            <>
+              <div className="list-heading">
+                <h2>Contactos</h2>
+                <span className="contact-count">{contacts.length}</span>
+              </div>
 
-            <header className="header">
+              <ContactTable contacts={contacts} onDelete={setSelected} />
+            </>
+          )}
+        </section>
+      </div>
 
-                <h1>Gestor de Contactos</h1>
+      <ConfirmModal
+        open={selected !== null}
+        title="Eliminar contacto"
+        message={`¿Desea eliminar a ${selected?.nombre}?`}
+        onConfirm={handleDelete}
+        onCancel={() => setSelected(null)}
+      />
 
-                <p>Administra tus contactos de forma sencilla.</p>
-
-            </header>
-
-            <SearchBar
-                value={search}
-                onChange={setSearch}
-            />
-
-            <div className="content-grid">
-
-                <ContactForm onSubmit={handleCreate} />
-
-                <section>
-
-                    {loading ? (
-
-                        <p>Cargando contactos...</p>
-
-                    ) : (
-
-                        <>
-                            <p className="contact-count">
-                                {contacts.length} contacto(s)
-                            </p>
-
-                            <ContactTable
-                                contacts={contacts}
-                                onDelete={setSelected}
-                            />
-                        </>
-
-                    )}
-
-                </section>
-
-            </div>
-
-            <ConfirmModal
-                open={selected !== null}
-                title="Eliminar contacto"
-                message={`¿Desea eliminar a ${selected?.nombre}?`}
-                onConfirm={handleDelete}
-                onCancel={() => setSelected(null)}
-            />
-
-            <Toast
-                message={toast.message}
-                type={toast.type}
-            />
-
-        </main>
-
-    );
+      <Toast message={toast.message} type={toast.type} />
+    </main>
+  );
 }

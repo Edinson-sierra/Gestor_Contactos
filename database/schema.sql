@@ -13,7 +13,7 @@ COLLATE utf8mb4_unicode_ci;
 
 USE contact_manager;
 
-//Tabla: contacts
+--Tabla: contacts
 
 
 CREATE TABLE IF NOT EXISTS contacts (

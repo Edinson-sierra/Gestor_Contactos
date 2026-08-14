@@ -1,11 +1,5 @@
 export default function Toast({ message, type }) {
+  if (!message) return null;
 
-    if (!message) return null;
-
-    return (
-        <div className={`toast ${type}`}>
-            {message}
-        </div>
-    );
-
+  return <div className={`toast toast--${type}`}>{message}</div>;
 }
